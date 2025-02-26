@@ -19,10 +19,10 @@
     mu = 0.0005       // gene loss rate
     loss = 0.0005    // phage loss rate
 
-    pi = 0.01
+    var logpi = -2
     radius = 1
-    seed = 1
-    Vdiff = 0.1
+    var seed = 1
+    var Vdiff = 0.1
 
     beta = 0.005  // infection rate
     rV = 30      // burst size
@@ -64,7 +64,7 @@
 
         sim.createDisplay("cell","alive","Cells")
         sim.createDisplay("cell","moron","Prophage-encoded gene")
-        sim.cell.canvases["Prophage-encoded gene"].legend.style.display = "none"
+        sim.cell.canvases["Prophage-encoded gene"].remove_legend()
         sim.createDisplay_continuous({model:"ext", property:"V", label:"Non-carrier virion", minval:0, maxval:10, fill:"viridis", nticks: 3, decimals: 0})
         sim.createDisplay_continuous({model:"ext", property:"VT", label:"Carrier virion", minval:0, maxval:10, fill:"viridis", nticks: 3, decimals: 0})
 
@@ -74,7 +74,7 @@
             sim.initialGrid(sim.cell, "moron", 0, 1)
         }
 
-        sim.cell.initialise()
+
 
         // Initialization of external virion particle density
         sim.ext.initialise = function () {
@@ -82,7 +82,13 @@
             sim.initialGrid(sim.ext, "VT", 5, 0.0, 0, 1)
         }
 
-        sim.ext.initialise()
+        sim.reset = function(){
+          sim.cell.resetPlots()
+          sim.cell.initialise()
+          sim.ext.initialise()
+        }
+        sim.reset()
+        sim.mixcells = false
 
         // Next State Function of bacteria
         sim.cell.nextState = function (i, j) {
@@ -129,6 +135,7 @@
                 }
 
                 // If cell is U, die or get infected or do nothing
+                let pi = Math.pow(10,logpi)
                 if (this.grid[i][j].alive == 'U'){
                     // death
                     frac = numL_T/(numL_nT+numL_T)
@@ -364,7 +371,7 @@
             }
 
             this.asynchronous()
-
+            if(sim.mixcells) sim.cell.perfectMix()
             // Constant invasion attempt
             if (Lptot + Lcptot + VTtot == 0 && sim.time > 600){
                 for (let i = 0; i < this.nc; i++) for (let j = 0; j < this.nr; j++) {
@@ -391,10 +398,15 @@
             this.asynchronous()
         }
 
-        sim.addButton("Capture", function () {sim.sectionToPNG("movie", "sim_timepoint_")})
-        sim.addButton("Pause/continue", function () { sim.toggle_play() })
-        sim.addButton("Well-mix (all)", function () { sim.toggle_mix() })
 
+        //sim.addButton("Capture", function () {sim.sectionToPNG("movie", "sim_timepoint_")})
+        sim.addButton("Pause/continue", function () { sim.toggle_play() })
+        sim.addButton("Restart", function () { sim.reset() })
+        sim.addButton("Well-mix (cells)", function () { sim.mixcells = !sim.mixcells})
+
+        sim.addSlider("logpi",-3.5,0,0.5,"Pi (log-scaled)")
+        sim.addSlider("radius",1,7,1,"Range of cooperation")
+        sim.addSlider("Vdiff",0,1.001,0.001,"Virion diffusion rate")
         sim.start()
 
     }
