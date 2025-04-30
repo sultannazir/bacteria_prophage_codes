@@ -43,7 +43,7 @@
         // Configuration
         let config = {
             title: "Evolution of prophage-encoded accessory gene",
-            description: "Virtual experiment to check for invasion of prophage-associated gene in a population where the gene is chromosomally encoded. Parameters: pi = 0.01, Vdiff = 0.1",
+            description: "Virtual experiment to check for invasion of prophage-associated gene in a population where the gene is chromosomally encoded.",
             maxtime: 1000000,
             seed: seed,
             skip: 0,
@@ -52,7 +52,7 @@
             wrap: [true, true],       // Wrap boundary [COLS, ROWS]
             graph_interval: 1,
             num_colours: 1000,
-            statecolours: { alive: { 'U': '#FFFB9E', 'Uc': '#D3BCE6', 'L': '#E99438', 'Lc': '#7D67C6', 'Lp': '#B72E00', 'Lcp': '#370044' },
+            statecolours: { alive: { 'U': '#FFFB9E', 'Uc': '#6F2E9C', 'L': '#F7AC46', 'Lc': '#420064', 'Lp': '#CE5035', 'Lcp': '#140044' },
                             moron : 'random' }
         }
 
@@ -385,13 +385,13 @@
 
             this.plotArray(['U', 'Uc', 'L', 'Lc', 'Lp', 'Lcp'],
                 [Utot , Uctot , Ltot , Lctot , Lptot , Lcptot],
-                ['#FFFB9E', '#D3BCE6', '#E99438',  '#7D67C6', '#B72E00', '#370044'],
+                ['#FFFB9E', '#6F2E9C', '#F7AC46', '#420064', '#CE5035', '#140044'],
                 "Bacterial population size")
 
             this.plotArray(["Non-carrier", "Carrier"],
                 [Vtot, VTtot],
                 ['black', 'red'],
-                "Virion abundnace")
+                "Virion abundance")
         }
 
         sim.ext.update = function (){
@@ -438,6 +438,11 @@
     <div class="content" id="graph_holder"> </div>
     </div>
     <div class="content" id="form_holder"></div>
+    <figure>
+      <div class="figure-title">Model overview</div>
+      <img src="model.png" alt="Model illustration" width="800">
+      <figcaption>(A) Phage lifecycle (B) Genotype space - each grid point is coloured based on the genotype of the cell and black for empty space (C) Expression of cooperative trait with privatisation (D) Mutations </figcaption>
+    </figure>
     <div class="footer" id="footer"></div>
 </body>
 

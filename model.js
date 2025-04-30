@@ -348,8 +348,14 @@ sim.cell.update = function (){
 
     // Write output
     if (sim.time%1000==0){
-      sim.write_append(sim.time+'\t'+Utot+'\t'+Uctot+'\t'+Ltot+'\t'+Lctot+'\t'+Lptot+'\t'+Lcptot+'\t'+Vtot+'\t'+VTtot+'\n', "timeseries_data/sample/sample_R"+cmd_params.R+"pi"+cmd_params.pi+"iter"+iter+"VD"+VD+".dat")
-      if (Uctot+Lctot+Lptot+Lcptot+VTtot==0) process.exit() // end simulation is gene is extinct
+      sim.write_append(sim.time+'\t'+Utot+'\t'+Uctot+'\t'+Ltot+'\t'+Lctot+'\t'+Lptot+'\t'+Lcptot+'\t'+Vtot+'\t'+VTtot+'\n', 'timeseries_data/pi'+cmd_params.pi+'VD'+VD+'/timeseries.dat')
+      // if (Uctot+Lctot+Lptot+Lcptot+VTtot==0) {
+      //   sim.write_grid(sim.cell,'alive', 'grids/pi'+cmd_params.pi+'VD'+VD+`/grid_${sim.time}.dat`)
+      //   process.exit() // end simulation if gene is extinct
+      // }
+    }
+    if (sim.time%5000==0){
+      sim.write_grid(sim.cell,'alive', 'grids/pi'+cmd_params.pi+'VD'+VD+`/grid_${sim.time}.dat`)
     }
 
     // induce mutation (1% Lcbecomes Lp) is phage encoded gene goes extinct
