@@ -5,10 +5,12 @@ let cmd_params = yargs.argv
 
 // Import paramter values from command line
 // to run on the command line: node model.js --pi 4 --R 1 --seed 1 --VD -1
-let pi = 10**(cmd_params.pi * -0.5)
+let pi = 10**(cmd_params.pi * -0.25)
 let radius = cmd_params.R   // If =1, R is set to infinity
 let iter = cmd_params.seed
 let VD = cmd_params.VD
+let IwGR = cmd_params.IR
+let mix = cmd_params.mix
 
 let Vdiff = 10**(-1*VD) // If >1 (i.e. VD < 0), the virions are well-mixed
 let seed = iter
@@ -18,17 +20,17 @@ let seed = iter
 b = 0.5
 phi = 1             // interaction strength parameter (also carrying capacity parameter)
 d = b*phi/(1+phi)   // max increase in death rate
-alpha = 0.0005       // lysis rate
+alpha = 0.001       // lysis rate
 dint = 0.005
 
-mu = 0.0005       // gene loss rate
+mu = 0.00005       // gene loss rate
 loss = 0.0005    // phage loss rate
 
 if (pi < 10**-5) pi = 0.0 // Asume no privatization if pi is below 0.00001
 
-beta = 0.005  // infection rate
+beta = 0.01  // infection rate
 rV = 30      // burst size
-g = 0.005     // virion decay rate
+g = 0.01     // virion decay rate
 
 var vir = ["Uc", "Lc", "Lp", "Lcp"] // Define list of carrier genotypes
 
@@ -44,7 +46,7 @@ Number.prototype.mod = function(n) {
 let config = {
     title: "Within host bacteria-phage dynamics",
     description: "Radius = 0, phi = 1",
-    maxtime: 250000,
+    maxtime: 1000000,
     seed: seed,
     ncol: size,
     nrow: size,		            // dimensions of the grid to build
@@ -216,7 +218,8 @@ sim.cell.nextState = function (i, j) {
                     sim.ext.grid[i][j].VT += rV
             }
             else if (rand < death + alpha + loss){
-                    this.grid[i][j].alive = 'U'
+                    if (IwGR == 1) this.grid[i][j].alive = 'Uc'
+                    else this.grid[i][j].alive = 'U'
             }
             else if (rand < death + alpha + loss + mu){
                     this.grid[i][j].alive = 'L'
@@ -344,14 +347,14 @@ sim.cell.update = function (){
     }
 
     this.synchronous()
-    //this.perfectMix()
+    if (mix == 1) this.perfectMix()
 
     // Write output
     if (sim.time%1000==0){
-      sim.write_append(sim.time+'\t'+Utot+'\t'+Uctot+'\t'+Ltot+'\t'+Lctot+'\t'+Lptot+'\t'+Lcptot+'\t'+Vtot+'\t'+VTtot+'\n', 'timeseries_data/pi'+cmd_params.pi+'VD'+VD+'/timeseries.dat')
+      sim.write_append(sim.time+'\t'+Utot+'\t'+Uctot+'\t'+Ltot+'\t'+Lctot+'\t'+Lptot+'\t'+Lcptot+'\t'+Vtot+'\t'+VTtot+'\n', 'timeseries_24sep25/grids3/timeseries_pi'+cmd_params.pi+'VD'+VD+'.dat')
     }
     if (sim.time%5000==0){
-      sim.write_grid(sim.cell,'alive', 'grids/pi'+cmd_params.pi+'VD'+VD+`/grid_${sim.time}.dat`)
+      sim.write_grid(sim.cell,'alive', 'timeseries_24sep25/grids3/pi'+cmd_params.pi+'VD'+VD+`/grid_${sim.time}.dat`)
     }
 
     // induce mutation (1% Lcbecomes Lp) is phage encoded gene goes extinct

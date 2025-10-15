@@ -13,20 +13,20 @@
     b = 0.5
     phi = 1             // interaction strength parameter (also carrying capacity parameter)
     d = b*phi/(1+phi)   // max increase in death rate
-    alpha = 0.0005       // lysis rate
+    alpha = 0.001       // lysis rate
     dint = 0.005
 
-    mu = 0.0005       // gene loss rate
+    mu = 0.00005       // gene loss rate
     loss = 0.0005    // phage loss rate
 
-    var logpi = -2
-    radius = 1
-    var seed = 1
-    var Vdiff = 0.1
-
-    beta = 0.005  // infection rate
+    beta = 0.01  // infection rate
     rV = 30      // burst size
-    g = 0.005     // virion decay rate
+    g = 0.01     // virion decay rate
+
+    var logpi = -2.75
+    radius = 1
+    var seed = 100
+    var Vdiff = 0.1
 
     var vir = ["Uc", "Lc", "Lp", "Lcp"]
 
@@ -70,7 +70,7 @@
 
         // Initialization of bacteria
         sim.cell.initialise = function () {
-            sim.initialGrid(sim.cell, "alive", 0, 0, 'U', 0.00, 'Uc', 0.0, 'L', 0.0, 'Lc', 1.0, 'Lp', 0, 'Lcp', 0.0)
+            sim.initialGrid(sim.cell, "alive", 0, 0, 'U', 0.00, 'Uc', 0.0, 'L', 0.5, 'Lc', 0.5, 'Lp', 0, 'Lcp', 0.0)
             sim.initialGrid(sim.cell, "moron", 0, 1)
         }
 
@@ -102,11 +102,7 @@
                 if (rand < b){
                     nbr = this.randomMoore8(this, i, j)
                     this.grid[i][j].alive = nbr.alive
-                    if (["Uc","Lc","Lcp"].includes(this.grid[i][j].alive)) birth_C ++
-                    if (["Lp","Lcp"].includes(this.grid[i][j].alive)) {
-                        birth_P ++
-                        this.grid[i][j].moron = nbr.moron
-                    }
+                    this.grid[i][j].moron = nbr.moron
                 }
             }
 
@@ -168,6 +164,7 @@
                     var death = dint + d*(1 - pi - (1-pi)*frac)
                     if (rand < death){
                         this.grid[i][j].alive = 0
+                        this.grid[i][j].moron = 0
                     }
 
                     else if (rand < death +  mu){
@@ -214,16 +211,19 @@
                     var death = dint + d*(1 - pi -(1-pi)*frac)
                     if (rand < death){
                         this.grid[i][j].alive = 0
+                        this.grid[i][j].moron = 0
                     }
                     else if(rand  < death + alpha){
                         this.grid[i][j].alive = 0
                         sim.ext.grid[i][j].V += rV
+                        this.grid[i][j].moron = 0
                     }
                     else if (rand < death + alpha + loss){
                         this.grid[i][j].alive = 'Uc'
                     }
                     else if (rand < death + alpha + loss + mu){
                         this.grid[i][j].alive = 'L'
+                        this.grid[i][j].moron = 0
                     }
                 }
 
@@ -353,6 +353,7 @@
         sim.cell.update = function (){
             birth_C = 0, lysis_C = 0, death_C = 0, mut_C = 0, birth_P = 0, lysis_P = 0, death_P = 0, mut_P = 0, inf_P = 0
 
+            // Compute abundances by cell-type
             num_nT = 0, num_T = 0
             let Utot = 0, Uctot = 0, Ltot = 0, Lctot = 0, Lptot = 0, Lcptot = 0, Vtot = 0, VTtot = 0
             for (let i = 0; i < this.nc; i++) for (let j = 0; j < this.nr; j++) {
@@ -373,7 +374,7 @@
             this.asynchronous()
             if(sim.mixcells) sim.cell.perfectMix()
             // Constant invasion attempt
-            if (Lptot + Lcptot + VTtot == 0 && sim.time > 600){
+            if (Lptot + Lcptot + VTtot == 0 && sim.time > 10000){
                 for (let i = 0; i < this.nc; i++) for (let j = 0; j < this.nr; j++) {
                     if (this.grid[i][j].alive == 'Lc' && sim.rng.random() < 0.01) {
                         this.grid[i][j].alive = 'Lp'
@@ -404,7 +405,7 @@
         sim.addButton("Restart", function () { sim.reset() })
         sim.addButton("Well-mix (cells)", function () { sim.mixcells = !sim.mixcells})
 
-        sim.addSlider("logpi",-3.5,0,0.5,"Pi (log-scaled)")
+        sim.addSlider("logpi",-4,0,0.25,"Pi (log-scaled)")
         sim.addSlider("radius",1,7,1,"Range of cooperation")
         sim.addSlider("Vdiff",0,1.001,0.001,"Virion diffusion rate")
         sim.start()
