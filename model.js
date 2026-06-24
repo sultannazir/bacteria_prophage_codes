@@ -351,17 +351,26 @@ sim.cell.update = function (){
 
     // Write output
     if (sim.time%1000==0){
-      sim.write_append(sim.time+'\t'+Utot+'\t'+Uctot+'\t'+Ltot+'\t'+Lctot+'\t'+Lptot+'\t'+Lcptot+'\t'+Vtot+'\t'+VTtot+'\n', 'timeseries_24sep25/grids3/timeseries_pi'+cmd_params.pi+'VD'+VD+'.dat')
+      sim.write_append(sim.time+'\t'+Utot+'\t'+Uctot+'\t'+Ltot+'\t'+Lctot+'\t'+Lptot+'\t'+Lcptot+'\t'+Vtot+'\t'+VTtot+'\n', 'main_data/local_invasion/mix'+mix+'timeseries_pi'+cmd_params.pi+'VD'+VD+'iter'+iter+'.dat')
     }
-    if (sim.time%5000==0){
-      sim.write_grid(sim.cell,'alive', 'timeseries_24sep25/grids3/pi'+cmd_params.pi+'VD'+VD+`/grid_${sim.time}.dat`)
-    }
+    // if (sim.time%5000==0){
+    //   sim.write_grid(sim.cell,'alive', 'timeseries_24sep25/grids3/pi'+cmd_params.pi+'VD'+VD+`/grid_${sim.time}.dat`)
+    // }
 
-    // induce mutation (1% Lcbecomes Lp) is phage encoded gene goes extinct
+
     if (Lptot + Lcptot + VTtot == 0){
-      for (let i = 0; i < this.nc; i++) for (let j = 0; j < this.nr; j++) {
-        if (this.grid[i][j].alive == 'Lc' && sim.rng.random() < 0.01){
-          this.grid[i][j].alive = 'Lp'
+      // induce mutation (1% of all Lc becomes Lp) if phage encoded gene goes extinct
+      // for (let i = 0; i < this.nc; i++) for (let j = 0; j < this.nr; j++) {
+      //   if (this.grid[i][j].alive == 'Lc' && sim.rng.random() < 0.01){
+      //     this.grid[i][j].alive = 'Lp'
+      //   }
+      // }
+      // induce mutation (100% of Lc from 1% of the grid becomes Lp) if phage encoded gene goes extinct
+      var pp = sim.rng.genrand_int(0,this.nc-1)
+      var qq = sim.rng.genrand_int(0,this.nr-1)
+      for (let x = pp-6; x < pp+5; x++){
+        for (let y = qq-6; y < qq+5; y++){
+          if (this.grid[x.mod(this.nc)][y.mod(this.nr)].alive == 'Lc') this.grid[x.mod(this.nc)][y.mod(this.nr)].alive = 'Lp'
         }
       }
     }

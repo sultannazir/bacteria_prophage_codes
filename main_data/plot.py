@@ -23,11 +23,11 @@ for vidx in range(3):
     for r in range(0,R):
         E = 0
         for n in range(0,N):
-            if r%2==0:
-                rr = str(int((r+8)/2))
-            else:
-                rr = str((r+8)/2)
-            dat = pd.read_csv('data/mix1pi'+rr+'VD'+str(VDs[vidx])+'iter'+str(n+1)+'IwGR0timeseries.dat', delimiter='\t', names=['time', 'U', 'Uc', 'L', 'Lc', 'Lp', 'Lcp', 'V', 'VT'])
+            # if r%2==0:
+            #     rr = str(int((r+8)/2))
+            # else:
+            #     rr = str((r+8)/2)
+            dat = pd.read_csv('local_invasion/mix0timeseries_pi'+str(r+8)+'VD'+str(VDs[vidx])+'iter'+str(n+1)+'.dat', delimiter='\t', names=['time', 'U', 'Uc', 'L', 'Lc', 'Lp', 'Lcp', 'V', 'VT'])
             dat['fracC'] = (dat['Uc']+dat['Lc']+dat['Lcp'])/(dat['Uc']+dat['Lc']+dat['Lp']+2*dat['Lcp'])
             dat['fracP'] = (dat['Lp']+dat['Lcp'])/(dat['Uc']+dat['Lc']+dat['Lp']+2*dat['Lcp'])
             dat['gene'] = dat['Uc']+dat['Lc']+dat['Lp']+2*dat['Lcp']
@@ -70,6 +70,6 @@ for vidx in range(3):
     axes[vidx].invert_xaxis()
 axes[0].set_ylabel("Fraction of prophage-association", fontsize=14)
 
-#plt.show()
+# plt.show()
 
-plt.savefig("mixed_frac_of_prophage_association_pi.png")
+plt.savefig("local_invasion_frac_of_prophage_association_pi.png")

@@ -373,13 +373,25 @@
 
             this.asynchronous()
             if(sim.mixcells) sim.cell.perfectMix()
-            // Constant invasion attempt
             if (Lptot + Lcptot + VTtot == 0 && sim.time > 10000){
-                for (let i = 0; i < this.nc; i++) for (let j = 0; j < this.nr; j++) {
-                    if (this.grid[i][j].alive == 'Lc' && sim.rng.random() < 0.01) {
-                        this.grid[i][j].alive = 'Lp'
-                        this.grid[i][j].moron = moronIds.next().value%999 + 1
+                // induce mutation (1% of all Lc becomes Lp) if phage encoded gene goes extinct
+                // for (let i = 0; i < this.nc; i++) for (let j = 0; j < this.nr; j++) {
+                //     if (this.grid[i][j].alive == 'Lc' && sim.rng.random() < 0.01) {
+                //         this.grid[i][j].alive = 'Lp'
+                //         this.grid[i][j].moron = moronIds.next().value%999 + 1
+                //     }
+                // }
+
+                // induce mutation (100% of Lc from 1% of the grid becomes Lp) if phage encoded gene goes extinct
+                var pp = sim.rng.genrand_int(0,this.nc-1)
+                var qq = sim.rng.genrand_int(0,this.nr-1)
+                for (let x = pp-6; x < pp+5; x++){
+                  for (let y = qq-6; y < qq+5; y++){
+                    if (this.grid[x.mod(this.nc)][y.mod(this.nr)].alive == 'Lc') {
+                      this.grid[x.mod(this.nc)][y.mod(this.nr)].alive = 'Lp'
+                      this.grid[x.mod(this.nc)][y.mod(this.nr)].moron = moronIds.next().value%999 + 1
                     }
+                  }
                 }
             }
 
